@@ -1,5 +1,6 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE ExtendedDefaultRules #-}
 
 module Lib
     ( someFunc
@@ -15,10 +16,13 @@ import Data.String.Conversions
 import Data.List (transpose)
 import Control.Concurrent.Async (mapConcurrently)
 -- Part 3
+import qualified Data.Text.Lazy as TL
 import Control.Monad.IO.Class
 import Data.List.Split
 import Data.Monoid
 import Web.Spock.Safe
+import Lucid
+import Lucid.Bootstrap
 
 data Post = Post
   { subreddit :: T.Text
@@ -66,9 +70,48 @@ server =
        get ("hello" <//> var) $ \name ->
            text ("Hello " <> name <> "!")
        get "reddit" $ do
-          Just reddits <- param "reddits"
-          listing <- liftIO $ getReddits (splitOn "," reddits)
-          text (T.pack (show listing))
+          reddits <- param "reddits"
+          case reddits of
+            Nothing -> text "No Reddits Provided"
+            Just reddits' -> do
+              listing <- liftIO $ getReddits (splitOn "," reddits')
+              html (TL.toStrict (renderText (viewAll listing)))
+
+bootstrap :: Html ()
+bootstrap = link_
+  [ href_ "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+  , rel_ "stylesheet"
+  ]
+
+viewAll :: Listing -> Html ()
+viewAll listing = do
+  bootstrap
+  container_ (viewListing listing)
+
+viewListing :: Listing -> Html ()
+viewListing (Listing posts) =
+  mconcat $ map (renderPost) posts
+
+--data Post = Post
+--  { subreddit :: T.Text
+--  , author :: T.Text
+--  , score :: Int
+--  , url :: T.Text
+--  , title :: T.Text
+--  } deriving (Show)
+
+
+renderPost :: Post -> Html ()
+renderPost (Post{..}) = do
+  row_ $ colMd 12 (a_ [href_  url] (toHtml title))
+  row_ $ do
+    colMd 2 (toHtml $ "Score: " <> T.pack (show score))
+    colMd 2 (toHtml subreddit)
+    colMd 2 (toHtml author)
+  br_ []
+
+colMd :: Int -> Html () -> Html ()
+colMd rows = div_ [class_ ("col-md-" <> T.pack (show rows))]
 
 -- INTERNALS
 
