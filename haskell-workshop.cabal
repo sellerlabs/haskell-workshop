@@ -23,8 +23,10 @@ library
                      , vector
                      , string-conversions
                      , async
-                     , spock
+                     , Spock
                      , lucid
+                     , split
+                     , transformers
   default-language:    Haskell2010
 
 executable redditui

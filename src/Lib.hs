@@ -1,4 +1,5 @@
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Lib
     ( someFunc
@@ -13,6 +14,11 @@ import Data.String.Conversions
 -- Part 2
 import Data.List (transpose)
 import Control.Concurrent.Async (mapConcurrently)
+-- Part 3
+import Control.Monad.IO.Class
+import Data.List.Split
+import Data.Monoid
+import Web.Spock.Safe
 
 data Post = Post
   { subreddit :: T.Text
@@ -44,10 +50,25 @@ getReddits reddits = do
 -- Technically can be any Foldable but this suffices for now.
 -- TODO: Simplify?
 mergeListings :: [Listing] -> Listing
-mergeListings listings = Listing (concat . transpose $ map posts listings)
+mergeListings listings = Listing (interleaveMany (map posts listings))
+  where interleaveMany = concat . transpose
 
 someFunc :: IO ()
 someFunc = getReddits ["haskell", "darksouls"] >>= print
+
+-- Part 3 (Server)
+
+server :: IO ()
+server =
+    runSpock 8080 $ spockT id $
+    do get root $
+           text "Hello World!"
+       get ("hello" <//> var) $ \name ->
+           text ("Hello " <> name <> "!")
+       get "reddit" $ do
+          Just reddits <- param "reddits"
+          listing <- liftIO $ getReddits (splitOn "," reddits)
+          text (T.pack (show listing))
 
 -- INTERNALS
 
