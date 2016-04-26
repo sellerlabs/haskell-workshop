@@ -1,6 +1,6 @@
 module Main where
 
-import Lib
+import Reddit
 
 main :: IO ()
-main = someFunc
+main = server
