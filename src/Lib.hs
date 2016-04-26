@@ -24,6 +24,8 @@ import Web.Spock.Safe
 import Lucid
 import Lucid.Bootstrap
 
+-- Part 1
+
 data Post = Post
   { subreddit :: T.Text
   , author :: T.Text
