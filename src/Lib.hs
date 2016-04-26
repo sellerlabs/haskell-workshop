@@ -30,6 +30,7 @@ data Post = Post
   , score :: Int
   , url :: T.Text
   , title :: T.Text
+  , thumbnail :: T.Text
   } deriving (Show)
 
 data Listing = Listing { posts :: [Post] }
@@ -75,6 +76,7 @@ server =
             Nothing -> text "No Reddits Provided"
             Just reddits' -> do
               listing <- liftIO $ getReddits (splitOn "," reddits')
+              liftIO $ print listing
               html (TL.toStrict (renderText (viewAll listing)))
 
 bootstrap :: Html ()
@@ -92,23 +94,23 @@ viewListing :: Listing -> Html ()
 viewListing (Listing posts) =
   mconcat $ map (renderPost) posts
 
---data Post = Post
---  { subreddit :: T.Text
---  , author :: T.Text
---  , score :: Int
---  , url :: T.Text
---  , title :: T.Text
---  } deriving (Show)
-
-
 renderPost :: Post -> Html ()
 renderPost (Post{..}) = do
-  row_ $ colMd 12 (a_ [href_  url] (toHtml title))
+  row_ $ do
+    renderThumbnail thumbnail
+    colMd 8 (a_ [href_  url] (toHtml title))
   row_ $ do
     colMd 2 (toHtml $ "Score: " <> T.pack (show score))
     colMd 2 (toHtml subreddit)
     colMd 2 (toHtml author)
   br_ []
+
+renderThumbnail :: T.Text -> Html ()
+renderThumbnail src =
+  case T.breakOn "://" src of
+    (a, _) | a == "http" || a == "https" ->
+      colMd 2 (img_ [src_ src, width_ "80px"])
+    _ -> div_ ""
 
 colMd :: Int -> Html () -> Html ()
 colMd rows = div_ [class_ ("col-md-" <> T.pack (show rows))]
@@ -124,6 +126,7 @@ instance FromJSON Post where
       <*> dataO .: "score"
       <*> dataO .: "url"
       <*> dataO .: "title"
+      <*> dataO .: "thumbnail"
 
 instance FromJSON Listing where
   parseJSON = withObject "listing" $ \json -> do
