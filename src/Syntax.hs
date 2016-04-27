@@ -124,10 +124,10 @@ data List a = Cons a (List a) | Nil
 ---------------------------------------------------------------------------
 
 -- Let's start by declaring constant values. This line of code defines the
--- name `person` to be equal to be Vegeta.
+-- name `vegeta` to be the PersonA as descirbed.
 
 vegeta = PersonA "Vegeta" 9000
---
+
 -- If you just put two things together, Haskell assumes that you're trying
 -- to apply values to a function. Data constructors are functions, so you
 -- can apply "Vegeta" and 9000 to `PersonA` to get `person`.
