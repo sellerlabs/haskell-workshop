@@ -2,8 +2,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExtendedDefaultRules #-}
 
-module Lib
-    ( someFunc
+module Reddit
+    ( server
     ) where
 
 import Network.HTTP (simpleHTTP, getRequest, getResponseBody)
@@ -16,7 +16,6 @@ import Data.String.Conversions
 import Data.List (transpose)
 import Control.Concurrent.Async (mapConcurrently)
 -- Part 3
-import qualified Data.Text.Lazy as TL
 import Control.Monad.IO.Class
 import Data.List.Split
 import Data.Monoid
@@ -55,31 +54,28 @@ getReddits reddits = do
   pure (mergeListings listings)
 
 -- Technically can be any Foldable but this suffices for now.
--- TODO: Simplify?
 mergeListings :: [Listing] -> Listing
 mergeListings listings = Listing (interleaveMany (map posts listings))
   where interleaveMany = concat . transpose
 
-someFunc :: IO ()
-someFunc = getReddits ["haskell", "darksouls"] >>= print
+printReddits :: IO ()
+printReddits = do
+  listing <- getReddits ["haskell", "darksouls"]
+  print listing
 
 -- Part 3 (Server)
 
 server :: IO ()
-server =
-    runSpock 8080 $ spockT id $
-    do get root $
-           text "Hello World!"
-       get ("hello" <//> var) $ \name ->
-           text ("Hello " <> name <> "!")
-       get "reddit" $ do
-          reddits <- param "reddits"
-          case reddits of
-            Nothing -> text "No Reddits Provided"
-            Just reddits' -> do
-              listing <- liftIO $ getReddits (splitOn "," reddits')
-              liftIO $ print listing
-              html (TL.toStrict (renderText (viewAll listing)))
+server = runSpock 8080 $ spockT id $
+  do get "reddit" $ do
+      reddits <- param "reddits"
+      case reddits of
+        Nothing -> text "No Reddits Provided"
+        Just reddits' -> do
+          let redditList = splitOn "," reddits'
+          listing <- liftIO (getReddits redditList)
+          liftIO (print listing)
+          html (cs (renderText (viewAll listing)))
 
 bootstrap :: Html ()
 bootstrap = link_
@@ -94,41 +90,42 @@ viewAll listing = do
 
 viewListing :: Listing -> Html ()
 viewListing (Listing posts) =
-  mconcat $ map (renderPost) posts
+  mconcat (map renderPost posts)
 
 renderPost :: Post -> Html ()
-renderPost (Post{..}) = do
+renderPost (Post subreddit_ author_ score_ url_ title_ thumbnail_) = do
   row_ $ do
-    renderThumbnail thumbnail
-    colMd 8 (a_ [href_  url] (toHtml title))
+    renderThumbnail thumbnail_
+    colMd 8 (a_ [href_  url_] (toHtml title_))
   row_ $ do
-    colMd 2 (toHtml $ "Score: " <> T.pack (show score))
-    colMd 2 (toHtml subreddit)
-    colMd 2 (toHtml author)
+    colMd 2 ("Score: " <> toHtml (show score_))
+    colMd 2 (toHtml subreddit_)
+    colMd 2 (toHtml author_)
   br_ []
 
 renderThumbnail :: T.Text -> Html ()
-renderThumbnail src =
+renderThumbnail src = do
+  let imageColumn = colMd 2 (img_ [src_ src, width_ "80px"])
   case T.breakOn "://" src of
-    (a, _) | a == "http" || a == "https" ->
-      colMd 2 (img_ [src_ src, width_ "80px"])
+    ("http", _) -> imageColumn
+    ("https", _) -> imageColumn
     _ -> div_ ""
 
 colMd :: Int -> Html () -> Html ()
-colMd rows = div_ [class_ ("col-md-" <> T.pack (show rows))]
+colMd span = div_ [class_ ("col-md-" <> cs (show span))]
 
 -- INTERNALS
 
 instance FromJSON Post where
   parseJSON = withObject "post" $ \json -> do
     dataO <- json .: "data"
-    Post
-      <$> dataO .: "subreddit"
-      <*> dataO .: "author"
-      <*> dataO .: "score"
-      <*> dataO .: "url"
-      <*> dataO .: "title"
-      <*> dataO .: "thumbnail"
+    subreddit_ <-  dataO .: "subreddit"
+    author_ <- dataO .: "author"
+    score_ <- dataO .: "score"
+    url_ <- dataO .: "url"
+    title_ <- dataO .: "title"
+    thumbnail_ <- dataO .: "thumbnail"
+    pure (Post subreddit_ author_ score_ url_ title_ thumbnail_)
 
 instance FromJSON Listing where
   parseJSON = withObject "listing" $ \json -> do
