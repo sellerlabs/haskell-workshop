@@ -310,6 +310,12 @@ oneTwoThree = Cons 1 (Cons 2 (Cons 3 Nil))
 twoThreeFour :: List Int
 twoThreeFour = myMap (\x -> x + 1) oneTwoThree
 
+-- Lambda expressions start with a `\`, introduce the arguments, and start
+-- the expression with `->`. In ES5 JavaScript, this looks like:
+--
+--     function(x) { return x + 1; }
+--
+
 strings :: List String
 strings = myMap show oneTwoThree
 
@@ -369,6 +375,67 @@ myGuardFilter p (Cons a as)
 (</>) :: (a -> Bool) -> List a -> List a
 (</>) p list = myFilter p list
 -- We can use operators as prefix by surrounding them with parentheses.
+
+-- Since Haskell is so functional, we often want to compose functions
+-- together. Let's write that:
+
+compose :: (b -> c) -> (a -> b) -> a -> c
+compose f g a = f (g a)
+
+-- Haskellers like to pretend that we're mathemeticians, and give the
+-- smallest syntax to the most important/common ideas. For that reason, the
+-- `.` operator is used for function composition. Here's a somewhat
+-- contrived example:
+
+contrivedCompose :: Int -> Int
+contrivedCompose = add 5 . multiply 10
+  where
+    add = (+)
+    multiply = (*)
+    -- If we expand out the definitions above:
+    aka = \a -> add 5 (multiply 10 a)
+
+-- Composition is all about defining a pipeline where the values from from
+-- left to right through the functions. A long chain of composition, like
+--     
+--     composed = foo . bar . baz . quux
+-- 
+-- is generally nicer than 
+--    
+--     composed x = foo (bar (baz (quux x)))
+
+-- The last operator we'll need to introduce is `$`. `$` is an infix
+-- function that lets you use fewer parentheses. It's defined like:
+
+($) :: (a -> b) -> a -> b
+f $ x = f x
+
+infixr 0 $
+
+-- For any operator, we can define the associativity and precedence.
+-- $ associates to the right, which means that we can take a chain of `$`s
+-- and have implied parentheses grouping them to the right:
+--
+--     dollah x = foo $  bar $  baz $ quux x
+-- 
+-- is the same as:
+--
+--     parens x = foo $ (bar $ (baz $ quux x))
+--
+-- The precedence tells us in which order to evaluate infix operators. So
+-- a precedence of 0 means *last*, and 9 means *first*. Regular prefix
+-- function application is the highest precedence, so it gets evaluated
+-- first.
+--
+-- This is just like how we order arithmetic operations. The expression
+--
+--     5 * 4 + 10 + 3 * 6
+--
+-- has an implied parentheses of
+--
+--     (5 * 4) + 10 + (3 * 6)
+--
+-- since multiplication binds tighter than addition.
 
 ----------------------------------------------------------------------------
 --                      Do Syntax                                         --
