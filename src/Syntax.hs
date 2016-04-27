@@ -22,35 +22,9 @@ module Syntax where
 
 -- First thing is first: Haskell is *indentation sensitive*, like Python.
 -- Top level declarations must start at column 0. Otherwise, it's a parse
--- error.
-
-
--- The importings bits aren't super important to know, so feel free to skim
--- this and use it as a reference if you need later.
---
--- Next up, we can declare some imports. Haskell implicitly imports a small
--- standard library called the Prelude. Since we'll be re-implementing some
--- bits of it in this exercise, we're going to explicitly import only what
--- we need, and hide the rest. A declaration like:
--- 
---     import Prelude
--- 
--- brings the entire Prelude module into scope, so the names can be
--- referred to unqualified. This is equivalent to Python's 
---     
---     from Prelude import *
-
--- We can explicitly import only what we want using this syntax. This
--- declaration imports some stuff we'll use later. This syntax is
--- equivalent to Python's:
---
---     from Prelude import Int, String, Eq, Ord, Show
---
-import Prelude (Int, String, Eq, Ord, Show)
-
--- For the rest, we'll do a qualified import. This lets us refer to terms
--- in the Prelude like P.head, P.String, etc.
-import qualified Prelude as P
+-- error. If you start an expression or declaration on a column, you can
+-- continue that expression or declaration on a new line as long as you
+-- indent a little more.
 
 -- The "top level" of a Haskell source file is a bunch of declarations. The
 -- first set that we'll talk about are *data declarations*. This is how you
@@ -95,10 +69,25 @@ data PersonB = Adult String Int | Child String
 -- an system called 'type classes' to provide overloaded functions, and you
 -- must opt-in for these data types. Many type classes can be derived. The
 -- `deriving` keyword below derives instances for the `Eq` (equality),
--- `Ord` (ordering comparisons), and `Show` (printing as a string) type
--- classes.
+-- `Ord` (ordering comparisons), and `Show` (printing as a debug string)
+-- type classes.
 data PersonC = Adult' String Int | Child' String
   deriving (Eq, Ord, Show)
+
+-- Haskell provides a *record syntax*. This works just like a normal data
+-- declaration, and it also generates functions for accessing the data. It
+-- can be a convenient way to write "getters" for data at the same time as
+-- you define the type. 
+--
+-- One catch is that, since the record fields are just generated functions,
+-- you can't reuse the field names, and they can't be the same as any other
+-- function in the module.
+data Person = Person { personName :: String, personPowerLevel :: Int }
+
+-- The above declaration makes the `Person` type, with a `Person`
+-- constructor that takes a `String` and an `Int` parameter. It also
+-- generates two functions, `personName` and `personPowerLevel`, each of
+-- which take a `Person` as a parameter and return the `String` and `Int`.
 
 -- Generics are fun and easy in Haskell!  One of the most common examples
 -- of this is the `Maybe` type. Maybe is our first example of a generic
@@ -137,7 +126,7 @@ data List a = Cons a (List a) | Nil
 -- Let's start by declaring constant values. This line of code defines the
 -- name `person` to be equal to be Vegeta.
 
-person = PersonA "Vegeta" 9000
+vegeta = PersonA "Vegeta" 9000
 --
 -- If you just put two things together, Haskell assumes that you're trying
 -- to apply values to a function. Data constructors are functions, so you
@@ -171,6 +160,211 @@ goku = PersonA "Goku" 9001
 
 -- Let's write our first function! Functions are first class values in
 -- Haskell, and we can do anything with them that we can with other data
--- types. As a quick warm up, let's write our own `add` for convenience:
+-- types. Let's write a function to add 1 to a person's power level. I'm
+-- going to write a function here that is idiomatic Haskell, and I'll
+-- follow up with an annotated version.
 
+powerUp :: PersonA -> PersonA
+powerUp (PersonA name powerLevel) = PersonA name (powerLevel + 1)
 
+{-
++--------+--------------------- powerUp' 'has-the-type'
+|        |  +------------------ Takes a PersonA as argument
+|        |  |       +---------- Function arrow, can read as "to"
+|        |  |       |  +------- Returns a PersonA    
+V        V  V       V  V        -}
+powerUp' :: PersonA -> PersonA
+--        +-------------------- Pattern match on the Constructor
+--        |       +----+------- Bound parameters
+--        V       V    V
+powerUp' (PersonA name powerLevel) =
+--  +-------------------------- Reconstruct a person
+--  |       +------------------ Reuse the old name
+--  |       |     +------------ Add one to power level
+--  V       V     V         
+    PersonA name (powerLevel + 1)
+
+-- Haskell is immutable, so we never really modify data in place. Most
+-- functions in Haskell deconstruct data using pattern matching, and
+-- reconstruct it to do the job.
+
+-- Let's get the name of a person. Try this exercise on your own.
+getName :: PersonA -> Name
+getName = error "Write me!"
+
+-- Functions that take multiple arguments use the same arrow. The last
+-- thing in the type is the return type of the function. This function
+-- allows one person to absorb another person's power. The underscore in
+-- the second pattern match indicates that we don't care about that
+-- variable, and won't bind it.
+absorbPower :: PersonA -> PersonA -> PersonA
+absorbPower (PersonA name oldPower) (PersonA _ otherPower) =
+    PersonA name (oldPower + otherPower)
+
+-- Uh oh! Haskell values are immutable, and we're only returning one new
+-- PersonA. That means the old person still has all their power! The
+-- Haskell solution is to return *two* parameters, using a *tuple*. Tuples
+-- are a fixed length list of data types that can be of different types.
+--
+-- This function also introduces a *let expression*. We'll demonstrate the
+-- record accessor functions that we made for the regular Person type.
+absorbPower2 :: Person -> Person -> (Person, Person)
+absorbPower2 person victim =
+    let absorbedPower = personPowerLevel person + personPowerLevel victim
+        newPerson = Person (personName person) absorbedPower
+        drainedVictim = Person (personName victim) 0
+    in (newPerson, drainedVictim)
+
+-- There are two important bits here: `let` and *binding priority*.
+--
+-- `let ... in` allows us to define a bunch of intermediate terms that are
+-- only in scope for the expression following `in`.
+--
+-- Functions bind tighter than any infix operator. So the expression:
+--
+--     personPowerLevel person + personPowerLevel victim
+--
+-- is equivalent to
+--
+--     (personPowerLevel person) + (personPowerLevel victim)
+--
+
+-- There's another common way of declaring common expressions, using
+-- a `where` block. `let` is an expression and the new terms are only in
+-- scope in the expression of `in`, while a `where` declaration introduces
+-- them for the whole function declaration.
+--
+-- Rewriting the above function to use `where` looks like:
+absorbPowerWhere :: Person -> Person -> (Person, Person)
+absorbPowerWhere person victim =
+    (newPerson, drainedVictim)
+  where
+    absorbedPower = personPowerLevel person + personPowerLevel victim
+    newPerson = Person (personName person) absorbedPower
+    drainedVictim = Person (personName victim) 0
+    
+-- Alright, enough with people. Let's get into some more *functional*
+-- programming stuff. Singly linked lists make an awesome introduction to
+-- thinking about problems recursively and functionally. Let's write some
+-- functions for working with them.
+
+-- First, let's write a function that takes the first element of a list.
+-- This is called `head` in the Prelude for regular lists.
+
+myHead :: List a -> a
+myHead (Cons a _) = a
+-- Uh oh: what if we call it with an empty list? Haskell will crash at
+-- runtime with an error message: "missing pattern match on myHead: Nil".
+-- And, in fact, if you try to compile with only this definition, the
+-- compiler will issue a warning: 
+--
+--      Pattern match(es) are non-exhaustive in
+--      an equation for `myHead`: Patterns not matched: Nil
+-- 
+-- If you write a function that can crash at runtime like this, it's best
+-- to provide an informative error message.
+myHead Nil = error "myHead called with an empty list."
+-- This gets rid of the warning, but runtime failures are annoying. We can
+-- avoid this problem with `Maybe`:
+--
+-- We're also going to introduce our first *control flow* expression here.
+-- The `case` expression is used to pattern match on the value and provide
+-- different paths based on the different constructors.
+
+safeHead :: List a -> Maybe a
+safeHead list =
+    case list of
+         Cons a _ -> Just a
+         Nil -> Nothing
+
+-- This function will *never* crash at runtime -- it's called *total*, and
+-- that's a really desirable property.
+
+-- One common thing we want to do in Functional-Land is *map* over a list.
+-- Mapping over a list takes a function, a list, and returns a new list
+-- that is the result of applying the function it to every element in
+-- the input list.
+--
+--      +----- This argument is a *function* passed in
+--      V
+myMap :: (a -> b) -> List a -> List b
+-- Here we have the *base case* for working with lists: the empty list! If
+-- we have an empty list, then we can't apply the function to anything. So
+-- we *return* an empty list.
+myMap _ Nil = Nil
+myMap f (Cons a as) = Cons b bs
+  where
+    -- Now, we have a function `f :: a -> b`, and a value `a`. We need
+    -- a value of type `b`. We can apply `f` to `a` to get this.
+    b = f a
+    -- Next up, we have a value `as :: List a`, and we need a value 
+    -- `bs :: List b`. We can use `myMap` to provide that!
+    bs = myMap f as
+
+-- Passing functions to `myMap` is easy-peasy. We've got two options: we
+-- can pass a partially-applied function, or we can make a lambda
+-- expression (aka anonymous function).
+oneTwoThree :: List Int
+oneTwoThree = Cons 1 (Cons 2 (Cons 3 Nil))
+
+twoThreeFour :: List Int
+twoThreeFour = myMap (\x -> x + 1) oneTwoThree
+
+strings :: List String
+strings = myMap show oneTwoThree
+
+-- Haskellers use `map` so often that they've defined a special infix
+-- operator for it: <$>, which you can read as "mapped over"
+--
+--     function <$> list
+--
+-- reads as "function mapped-over the list." In truth, this function is
+-- generalized to work over a bunch of different types, not just lists. 
+-- That's beyond this right now.
+--
+-- Let's make our own infix operator for myMap! Infix operators need to
+-- have *only* symbols, but they can be defined just like functions.
+-- Indeed, they *are* just functions.
+
+{-
++------ To refer to an operator without any arguments, you surround it with
+|       parentheses
+V  -}
+(<%>) :: (a -> b) -> List a -> List b
+func <%> xs = myMap func xs
+--   ^
+--   +-- Operators can be defined infix.
+
+-- Next up, we'll implement filter. Filter is used to take a list and
+-- produce a new list that only has the objects satisfying some property.
+
+--         +--------  This function takes an `a` and returns `True` or
+--         |          `False`
+--         V
+myFilter :: (a -> Bool) -> List a -> List a
+-- Like `map`, filtering an empty list returns just an empty list.
+myFilter _ Nil = Nil
+-- For the recursive case, we have to check the object and see if it makes
+-- the predicate return true. We'll use an `if` expression. One important
+-- thing to note is that Haskell `if` *requires* that you specify an `else`
+-- clause!
+myFilter p (Cons a as) =
+    if p a
+       then Cons a (myFilter p as)
+       else myFilter p as
+-- Functional programmers often prefer to express things in terms of
+-- *guards*, rather than *if* expressions. Guards look like this:
+myGuardFilter _ Nil = Nil
+myGuardFilter p (Cons a as)
+    | p a = Cons a (myGuardFilter p as)
+    | otherwise = myGuardFilter p as
+-- The `|` introduces a predicate, and if the predicate is true, then that
+-- definition is used. `otherwise` is an alias for `True`, which always
+-- triggers. The alternatives are tried top-to-bottom, so you have to
+-- consider overlapping guards.
+
+-- Filtering is also pretty common, but we don't have an infix operator for
+-- that in Haskell usually. Let's define one:
+(</>) :: (a -> Bool) -> List a -> List a
+(</>) p list = myFilter p list
+-- We can use operators as prefix by surrounding them with parentheses.
