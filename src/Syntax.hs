@@ -354,6 +354,7 @@ myFilter p (Cons a as) =
        else myFilter p as
 -- Functional programmers often prefer to express things in terms of
 -- *guards*, rather than *if* expressions. Guards look like this:
+myGuardFilter :: (a -> Bool) -> List a -> List a
 myGuardFilter _ Nil = Nil
 myGuardFilter p (Cons a as)
     | p a = Cons a (myGuardFilter p as)
@@ -368,3 +369,73 @@ myGuardFilter p (Cons a as)
 (</>) :: (a -> Bool) -> List a -> List a
 (</>) p list = myFilter p list
 -- We can use operators as prefix by surrounding them with parentheses.
+
+----------------------------------------------------------------------------
+--                      Do Syntax                                         --
+----------------------------------------------------------------------------
+
+-- Okay, so at this point, you know how to read and write data
+-- declarations, functions, and expressions. Haskell has one last bit of
+-- syntax you need to learn in order to be productive. This is `do` syntax,
+-- introduced by the `do` keyword. We'll do some examples with `IO`, the
+-- type of input/output in Haskell.
+
+--           +----- This means we're doing IO
+--           |  +-- () signifies that we aren't returning anything
+--           V  V
+helloWorld :: IO ()
+helloWorld = do
+    putStrLn "Hello Worlding so hard rn"
+    putStrLn "so functional wow"
+
+-- You can read `IO a` as "An IO action that, when executed, returns
+-- a value of type `a`."
+
+-- The `do` block sequences the two prints, so when we call this function
+-- from `main`, it'll print these two strings out.
+-- Let's get some input now:
+
+prompt :: IO String
+prompt = do
+    putStrLn "Enter a text pls:"
+    line <- getLine
+    pure line
+
+-- Alright, we've used a new symbol: <-. This lets us `bind` the value from
+-- the thing on the right to the name on the left. `getLine` has the type:
+--
+--     getLine :: IO String
+--
+-- and, when executes, waits for the user to input a line and returns that
+-- to you. So when we use the arrow with `getLine`, we take the `IO
+-- String`, run the action, and `bind` the name `line` to the `String`
+-- inside the `IO`.
+
+-- The last line in a `do` block must have the type of the last thing. So
+-- if we wrote:
+--
+--     prompt :: IO String
+--     prompt = do
+--       putStrLn "Enter a text"
+--       line <- getLine
+--       line
+-- 
+-- we'd get a type error! This is because `line` has the type `String`, and
+-- the last line in a `do` block must have the type `IO String`. We can use
+-- the `pure` function to take any *pure* value and lift it into the `IO`
+-- type.
+--
+-- We can use `let` in a `do` block like you might expect.
+
+customPrompt :: String -> IO String
+customPrompt string = do
+    let promptStr = string ++ "> "
+    putStrLn promptStr
+    getLine
+
+-- Note that we didn't use `<-` to get the `line` out of `getLine`. The
+-- last line in the block has to match the type `IO String`, which
+-- `getLine` already does.
+
+-- That should be all the Haskell syntax you need to get started. Go have
+-- fun!
