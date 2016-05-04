@@ -53,6 +53,7 @@ To get the project set up, you'll need to run the following series of commands:
 ```bash
 $ git clone https://github.com/sellerlabs/haskell-workshop
 $ cd haskell-workshop
+$ stack setup
 $ stack install
 ```
 
