@@ -15,7 +15,9 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Reddit
+  exposed-modules:     FinalReddit,
+                       MyReddit,
+                       Syntax
   build-depends:       base >= 4.7 && < 5
                      , HTTP
                      , aeson
@@ -39,4 +41,4 @@ executable redditui
 
 source-repository head
   type:     git
-  location: https://github.com/5outh/haskell-workshop
+  location: https://github.com/sellerlabs/haskell-workshop

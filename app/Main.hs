@@ -1,6 +1,6 @@
 module Main where
 
-import Reddit
+import MyReddit
 
 main :: IO ()
 main = server

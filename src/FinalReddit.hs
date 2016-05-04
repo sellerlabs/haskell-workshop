@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExtendedDefaultRules #-}
 
-module Reddit
+module FinalReddit
     ( server
     ) where
 
@@ -12,9 +12,11 @@ import Data.Aeson.Types
 import qualified Data.Text as T
 import qualified Data.Vector as V
 import Data.String.Conversions
+
 -- Part 2
 import Data.List (transpose)
 import Control.Concurrent.Async (mapConcurrently)
+
 -- Part 3
 import Control.Monad.IO.Class
 import Data.List.Split

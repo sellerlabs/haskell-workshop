@@ -1,0 +1,150 @@
+
+./app/Main.hs,52
+module Main Main0,1
+main main4,5
+main main5,6
+
+./Setup.hs,15
+main main1,2
+
+./src/FinalReddit.hs,1008
+module FinalRedditFinalReddit4,5
+data Post Post29,30
+data Post = PostPost29,30
+  { subreddit subreddit30,31
+  , author author31,32
+  , score score32,33
+  , url url33,34
+  , title title34,35
+  , thumbnail thumbnail35,36
+data Listing Listing38,39
+data Listing = Listing Listing38,39
+data Listing = Listing { posts posts38,39
+getReddit getReddit41,42
+getReddit getReddit42,43
+getReddits getReddits52,53
+getReddits getReddits53,54
+mergeListings mergeListings58,59
+mergeListings mergeListings59,60
+printReddits printReddits62,63
+printReddits printReddits63,64
+server server69,70
+server server70,71
+bootstrap bootstrap81,82
+bootstrap bootstrap82,83
+viewAll viewAll87,88
+viewAll viewAll88,89
+viewListing viewListing92,93
+viewListing viewListing93,94
+renderPost renderPost96,97
+renderPost renderPost97,98
+renderThumbnail renderThumbnail107,108
+renderThumbnail renderThumbnail108,109
+colMd colMd115,116
+colMd colMd116,117
+instance instance120,121
+
+./src/MyReddit.hs,946
+module MyRedditMyReddit5,6
+data Post Post31,32
+data Post = PostPost31,32
+  { subreddit subreddit32,33
+  , author author33,34
+  , score score34,35
+  , url url35,36
+  , title title36,37
+  , thumbnail thumbnail37,38
+data Listing Listing40,41
+data Listing = Listing Listing40,41
+data Listing = Listing { posts posts40,41
+getReddit getReddit43,44
+getReddit getReddit44,45
+getReddits getReddits48,49
+getReddits getReddits49,50
+mergeListings mergeListings51,52
+mergeListings mergeListings52,53
+printReddits printReddits54,55
+printReddits printReddits55,56
+server server59,60
+server server60,61
+bootstrap bootstrap62,63
+bootstrap bootstrap63,64
+viewListing viewListing65,66
+viewListing viewListing66,67
+renderPost renderPost68,69
+renderPost renderPost69,70
+renderThumbnail renderThumbnail71,72
+renderThumbnail renderThumbnail72,73
+colMd colMd74,75
+colMd colMd75,76
+instance instance78,79
+
+./src/Syntax.hs,2112
+module Syntax Syntax19,20
+data PersonA PersonA44,45
+data PersonA = PersonA PersonA44,45
+data PersonB PersonB60,61
+data PersonB = Adult Adult60,61
+data PersonB = Adult String Int | Child Child60,61
+data PersonC PersonC73,74
+data PersonC = Adult' Adult'73,74
+data PersonC = Adult' String Int | Child' Child'73,74
+data Person Person84,85
+data Person = Person Person84,85
+data Person = Person { personName personName84,85
+data Person = Person { personName :: String, personPowerLevel personPowerLevel84,85
+data Maybe' Maybe'102,103
+data Maybe' a = Just' Just'102,103
+data Maybe' a = Just' a | Nothing'Nothing'102,103
+data List List113,114
+data List a = Cons Cons113,114
+data List a = Cons a (List a) | NilNil113,114
+vegeta vegeta128,129
+type PowerLevel PowerLevel138,139
+type Name Name139,140
+goku goku148,149
+goku goku149,150
+powerUp powerUp166,167
+powerUp powerUp167,168
+powerUp' powerUp'175,176
+powerUp' powerUp'179,180
+getName getName191,192
+getName getName192,193
+absorbPower absorbPower199,200
+absorbPower absorbPower200,201
+absorbPower2 absorbPower2210,211
+absorbPower2 absorbPower2211,212
+absorbPowerWhere absorbPowerWhere237,238
+absorbPowerWhere absorbPowerWhere238,239
+myHead myHead253,254
+myHead myHead254,255
+safeHead safeHead273,274
+safeHead safeHead274,275
+myMap myMap289,290
+myMap myMap293,294
+oneTwoThree oneTwoThree306,307
+oneTwoThree oneTwoThree307,308
+twoThreeFour twoThreeFour309,310
+twoThreeFour twoThreeFour310,311
+strings strings318,319
+strings strings319,320
+(<%>)<%>338,339
+func func339,340
+myFilter myFilter349,350
+myFilter myFilter351,352
+myGuardFilter myGuardFilter362,363
+myGuardFilter myGuardFilter363,364
+(</>)</>374,375
+(<(375,376
+compose compose381,382
+compose compose382,383
+contrivedCompose contrivedCompose389,390
+contrivedCompose contrivedCompose390,391
+($)$409,410
+f f410,411
+helloWorld helloWorld452,453
+helloWorld helloWorld453,454
+prompt prompt464,465
+prompt prompt465,466
+customPrompt customPrompt496,497
+customPrompt customPrompt497,498
