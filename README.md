@@ -44,8 +44,7 @@ You'll need this to compile and run your project.
 
 #### an open mind
 
-Haskell might look strange at first, but it's no more difficult than <insert language X here> to pick up! Keep an open
-mind and you'll be writing your own code in no time.
+Haskell might look strange at first, but it's no more difficult than any other language! Keep an open mind and you'll be writing your own code in no time.
 
 ### Setting up the project
 
