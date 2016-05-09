@@ -100,7 +100,7 @@ renderPost (Post subreddit_ author_ score_ url_ title_ thumbnail_) = do
     renderThumbnail thumbnail_
     colMd 8 (a_ [href_  url_] (toHtml title_))
   row_ $ do
-    colMd 1 (div_ "")
+    colMd 2 (div_ "")
     colMd 2 ("Score: " <> toHtml (show score_))
     colMd 2 (toHtml subreddit_)
     colMd 2 (toHtml author_)
