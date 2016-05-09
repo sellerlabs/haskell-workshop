@@ -83,3 +83,5 @@ Found yourself interested in learning more? Here's a short list of some great wa
 - [http://learnyouahaskell.com/](http://learnyouahaskell.com/) - How Ben picked up the language. Showing a bit of age but a fun, engaging introduction nonetheless.
 - [https://github.com/bitemyapp/learnhaskell](https://github.com/bitemyapp/learnhaskell) - Co-author of haskellbook's collection of resources on how to get started.
 - [http://dev.stephendiehl.com/hask/](http://dev.stephendiehl.com/hask/) - Intermediate level collection of tips and tricks for getting more out of Haskell once you've got the basics down.
+- [State of the Haskell Ecosystem](https://github.com/Gabriel439/post-rfc/blob/master/sotu.md) - A collection of topics, how well Haskell supports them, and what libraries are most useful for them
+- [Haskell Is Easy](http://www.haskelliseasy.com) - A quick start guide to using Haskell
