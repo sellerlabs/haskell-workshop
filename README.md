@@ -74,3 +74,12 @@ redditui: Not implemented...yet!
 ```
 
 At this point, you should be good to go!
+
+### After the Workshop
+
+Found yourself interested in learning more? Here's a short list of some great ways to start learning Haskell:
+
+- [http://haskellbook.com/](http://haskellbook.com/) - An comprehensive, in-development book. Very up-to-date and extensive! Great for beginners and experts alike.
+- [http://learnyouahaskell.com/](http://learnyouahaskell.com/) - How Ben picked up the language. Showing a bit of age but a fun, engaging introduction nonetheless.
+- [https://github.com/bitemyapp/learnhaskell](https://github.com/bitemyapp/learnhaskell) - Co-author of haskellbook's collection of resources on how to get started.
+- [http://dev.stephendiehl.com/hask/](http://dev.stephendiehl.com/hask/) - Intermediate level collection of tips and tricks for getting more out of Haskell once you've got the basics down.
