@@ -84,9 +84,12 @@ Accessing reddit using HTTP instead of HTTPS no longer works as shown during the
 #### `MyReddit.hs`
 
 ```hs
--- import Network.HTTP (simpleHTTP, getRequest, getResponseBody) -- remove/comment out
-import qualified Network.Wreq as W (asJSON, get, responseBody) -- add
-import Control.Lens.Getter ((^.)) -- add
+-- remove:
+-- import Network.HTTP (simpleHTTP, getRequest, getResponseBody)
+
+-- add:
+import qualified Network.Wreq as W (asJSON, get, responseBody)
+import Control.Lens.Getter ((^.))
 ```
 
 Replace `getReddit` with
