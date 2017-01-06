@@ -4,6 +4,8 @@ Haskell Workshop - Spring 2016
 
 ## Overview
 
+*See __HTTPS Fix__ below concerning breaking change in Reddit API.*
+
 This is intended to be a zero-to-something introduction to Haskell for working programmers who are
 interested in functional programming, but don't know where to start.
 
@@ -74,6 +76,36 @@ redditui: Not implemented...yet!
 ```
 
 At this point, you should be good to go!
+
+### HTTPS Fix
+
+Accessing reddit using HTTP instead of HTTPS no longer works as shown during the live coding session. Here is the suggested fix to get `getReddit` working again.
+
+#### `MyReddit.hs`
+
+```hs
+-- import Network.HTTP (simpleHTTP, getRequest, getResponseBody) -- remove/comment out
+import qualified Network.Wreq as W (asJSON, get, responseBody) -- add
+import Control.Lens.Getter ((^.)) -- add
+```
+
+Replace `getReddit` with
+
+```hs
+getReddit :: String -> IO Listing
+getReddit subreddit = do
+  let url = "https://www.reddit.com/r/" <> subreddit <> "/hot/.json"
+  r <- W.asJSON =<< W.get url
+  pure (r ^. W.responseBody)
+```
+
+#### `haskell-workshop.cabal`
+
+Add `containers`, `lens` and `wreq` to dependencies.
+
+#### `stack`
+
+`stack build` and—touch wood—you should be able to follow the tutorial.
 
 ### After the Workshop
 
