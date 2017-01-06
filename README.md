@@ -79,9 +79,9 @@ At this point, you should be good to go!
 
 ### HTTPS Fix
 
-Accessing reddit using `http` instead of `https` no longer works as shown during the live coding session. Here is the suggested fix to get `getReddit` working again.
+Accessing reddit using HTTP instead of HTTPS no longer works as shown during the live coding session. Here is the suggested fix to get `getReddit` working again.
 
-#### 1) `MyReddit.hs`
+#### `MyReddit.hs`
 
 ```hs
 -- import Network.HTTP (simpleHTTP, getRequest, getResponseBody) -- remove/comment out
@@ -99,11 +99,11 @@ getReddit subreddit = do
   pure (r ^. W.responseBody)
 ```
 
-#### 2) `haskell-workshop.cabal`
+#### `haskell-workshop.cabal`
 
 Add `containers`, `lens` and `wreq` to dependencies.
 
-#### 3) `stack`
+#### `stack`
 
 `stack build` and—touch wood—you should be able to follow the tutorial.
 
